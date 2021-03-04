@@ -29,6 +29,105 @@ var (
 // If it does not exist the bool result will be false.
 type confGetter func(string) (string, bool)
 
+// Parse reads OS environment variables and fills the struct in the value pointed to by v.
+// If v is nil or not a pointer to a struct, Parse returns an error.
+//
+// Parse examines the tags on the fields of the struct pointed to by v in order to
+// determine which environment variables should be read for which field, and how
+// the string environment variables should be parsed into the type of each field.
+//
+// The struct field types supported by Parse are:
+//   string
+//   bool
+//   int, int8, int16, int32/rune, int64
+//   uint, uint8, uint16, uint32, uint64
+//   float32, float64
+//   complex64, complex128
+// In addition, pointers to and slices of the above types are supported.
+// Nested structs are supported.
+//
+// Types which are not supported are:
+//   arrays
+//   slices of structs
+//   interfaces
+//   json, xml, yaml, etc. (although JSON may be added in the future)
+//
+// The struct tags used by phnenv must have the key "phnenv" and include at least
+// an evironment variable name:
+//
+//   s := struct {
+//       FieldName string `phnenv:"ENVIRONMENT_VAR"`
+//   }{}
+//
+//   err := phnenv.Parse(&s)
+//
+// In the above example, the ENVIRONMENT_VAR variable will be parsed as a string
+// and the result set into s.FieldName.
+//
+// Additional options for how to parse the environment variable can be added
+// to a field's tag if necessary.
+//
+// The parsing options supported by this version of phnenv are:
+//
+//   rune
+//   bitsize:
+//   base:
+//
+// The `rune` parsing option can be applied to fields of type int32
+// (the standard Go rune type is an alias for int32, so you can also use the type rune).
+// This option tells the parser to parse the environment variable as a single character/rune
+// instead of as a base 10 number (the default behavior for int32).
+// For example, the following code will print "字" instead of returning a string to integer
+// parsing error.
+//
+//   // In the OS: `ENV_VAR=字`
+//
+//   s := struct {
+//      Field rune `phnenv:"ENV_VAR,rune"`
+//   }{}
+//
+//   phnenv.Parse(&s)
+//   fmt.Println(s.Field)
+//
+// The `bitsize:` option specifies the bit width of the numeric type that the result must fit into.
+// This option can be applied to fields of int, uint, float, and complex.
+// This is the same as the bitsize parameter to the standard library strconv.ParseInt
+// (or parse float, complex, uint) function. So please check the documentation in strconv
+// for more information. Example usage where the parsing result must fit into 8 bits
+// (Note that a similar check could be achieved by making Field's type uint8):
+//
+//   s := struct {
+//      Field int64 `phnenv:"ENV_VAR,bitsize:8"`
+//   }{}
+//
+// The `base:` option specifies the mathematical base that the string will be parsed as.
+// This option can be applied to fields of int and uint.
+// It functions the same as the `base` parameter to strconv.ParseInt and strconv.ParseUint.
+// Please check the documentation of those functions in strconv for more information.
+// Example usage where the string environment variable ENV_VAR should be parsed to int as
+// base 2 (binary):
+//
+//   s struct {
+//      Field int `phnenv:"ENV_VAR,base:2"`
+//   }{}
+//
+// Details on how parsing works for each type:
+//
+//   string: copied directly from the environment variable
+//   int: parsed using strconv.ParseInt
+//   uint: parsed using strconv.ParseUint
+//   float: parsed using strconv.ParseFloat
+//   complex: parsed using strconv.ParseComplex
+//   bool: if the environment variable's string equals (ignoring case) "true" then the bool
+//      will be true
+//   slices: the environment variable's string will be split using "," as the separator
+//      and the indexes will be handled individually
+//
+// Errors will be returned by Parse in the following cases:
+//    1. Parsing one or more field fails for any reason.
+//    2. One or more struct tags is malformed or invalid.
+//    3. The input v is not a pointer to a struct.
+//    4. A phnenv struct tag was placed on a struct field of an unsupported type.
 func Parse(v interface{}) error {
 	err := parse(os.LookupEnv, v)
 	if err != nil {

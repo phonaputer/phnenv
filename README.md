@@ -122,6 +122,8 @@ type Example struct {
 }
 ```
 
+If `base` and `bitsize` are not specified, base 10 and bitsize 64 will be used.
+
 #### Special case: rune/uint32
 
 `uint32`/`rune` is parsed by default using `strconv.ParseInt`.
@@ -139,16 +141,19 @@ type Example struct {
 
 Unsigned integer types are parsed using the standard library `strconv.ParseUint` function.
 The `base` and `bitsize` parameters of `strconv.ParseUint` can be specified in the struct tag (see **Int** above).
+If `base` and `bitsize` are not specified, base 10 and bitsize 64 will be used.
 
 ### Float
 
 Float types are parsed using the standard library `strconv.ParseFloat` function.
 The `bitsize` parameter of `strconv.ParseFloat` can be specified in the struct tag (see **Int** above).
+If `base` and `bitsize` are not specified, base 10 and bitsize 64 will be used.
 
 ### Complex
 
 Complex types are parsed using the standard library `strconv.ParseComplex` function.
 The `bitsize` parameter of `strconv.ParseComplex` can be specified in the struct tag (see **Int** above).
+If `base` and `bitsize` are not specified, base 10 and bitsize 128 will be used.
 
 ### Slice
 

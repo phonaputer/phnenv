@@ -115,11 +115,7 @@ func isTag(val string, t string, isPrefix bool) bool {
 		return val == t
 	}
 
-	if len(val) >= len(t) {
-		return val[:len(t)] == t
-	}
-
-	return false
+	return hasPrefix(val, t)
 }
 
 func setOpt(to tagOpts, opt string) (tagOpts, error) {
@@ -159,7 +155,7 @@ func setOpt(to tagOpts, opt string) (tagOpts, error) {
 }
 
 func parseBase(s string) (int, bool, error) {
-	if len(s) < len(tagNumBase) || s[:len(tagNumBase)] != tagNumBase {
+	if !hasPrefix(s, tagNumBase) {
 		return 0, false, nil
 	}
 
@@ -174,7 +170,7 @@ func parseBase(s string) (int, bool, error) {
 }
 
 func parseBitSize(s string) (int, bool, error) {
-	if len(s) < len(tagNumBitSize) || s[:len(tagNumBitSize)] != tagNumBitSize {
+	if !hasPrefix(s, tagNumBitSize) {
 		return 0, false, nil
 	}
 
@@ -189,7 +185,7 @@ func parseBitSize(s string) (int, bool, error) {
 }
 
 func parseSep(s string) (string, bool, error) {
-	if len(s) < len(tagSliceSep) || s[:len(tagSliceSep)] != tagSliceSep {
+	if !hasPrefix(s, tagSliceSep) {
 		return "", false, nil
 	}
 
@@ -200,6 +196,14 @@ func parseSep(s string) (string, bool, error) {
 	}
 
 	return sep, true, nil
+}
+
+func hasPrefix(v string, prefix string) bool {
+	if len(v) >= len(prefix) {
+		return v[:len(prefix)] == prefix
+	}
+
+	return false
 }
 
 func isRune(s string) bool {

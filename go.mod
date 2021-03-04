@@ -1,4 +1,4 @@
-module phnenv
+module github.com/phonaputer/phnenv
 
 go 1.16
 

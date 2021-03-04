@@ -94,11 +94,11 @@ In addition, pointers to and slices of the above types are supported (including 
 
 ## How does parsing work?
 
-First, the parser checks to see if a variable exists in the environment with the specified name.
+For each `phnenv` tagged field in your struct, first, the parser checks to see if a variable exists in the environment with the specified name.
 It does this using the standard library `os.LookupEnv` function.
-If the variable does NOT exist, the current struct field value is not modified and no error is thrown.
+If the variable does NOT exist, the struct field's value is not modified and no error is thrown.
 If the variable does exist, it is parsed based on the type of the struct field and the result of parsing is placed into the field.
-If the variable cannot be parsed as the field type, an error is returned.
+If the variable cannot be parsed as the field type, parsing stops and an error is returned.
 
 ## How Different Types are Parsed
 

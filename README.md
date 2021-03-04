@@ -147,13 +147,13 @@ If `base` and `bitsize` are not specified, base 10 and bitsize 64 will be used.
 
 Float types are parsed using the standard library `strconv.ParseFloat` function.
 The `bitsize` parameter of `strconv.ParseFloat` can be specified in the struct tag (see **Int** above).
-If `base` and `bitsize` are not specified, base 10 and bitsize 64 will be used.
+If `bitsize` is not specified, bitsize 64 will be used.
 
 ### Complex
 
 Complex types are parsed using the standard library `strconv.ParseComplex` function.
 The `bitsize` parameter of `strconv.ParseComplex` can be specified in the struct tag (see **Int** above).
-If `base` and `bitsize` are not specified, base 10 and bitsize 128 will be used.
+If `bitsize` is not specified, bitsize 128 will be used.
 
 ### Slice
 

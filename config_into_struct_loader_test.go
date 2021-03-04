@@ -325,6 +325,10 @@ var test_parse_UnsupportedFieldType_ReturnsError = []struct {
 		&struct {
 			F []struct{} `phnenv:"sdgas"`
 		}{}},
+	{"nested slice",
+		&struct {
+			F [][]string `phnenv:"sdgas"`
+		}{}},
 	{"map",
 		&struct {
 			F map[string]string `phnenv:"sdgas"`

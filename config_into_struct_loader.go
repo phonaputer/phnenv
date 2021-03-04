@@ -47,6 +47,7 @@ type confGetter func(string) (string, bool)
 // Types which are not supported are:
 //   arrays
 //   slices of structs
+//   nested slices
 //   interfaces
 //   json, xml, yaml, etc. (although JSON may be added in the future)
 //
@@ -343,6 +344,10 @@ func setBasicComplex(conf string, to tagOpts, fieldVal reflect.Value) error {
 }
 
 func setSlice(conf string, to tagOpts, fv reflect.Value) error {
+	if fv.Type().Elem().Kind() == reflect.Slice {
+		return errUnsupportedType
+	}
+
 	var splt []string
 	if len(conf) > 0 {
 		splt = strings.Split(conf, to.SliceSep)

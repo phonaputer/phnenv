@@ -115,7 +115,11 @@ func isTag(val string, t string, isPrefix bool) bool {
 		return val == t
 	}
 
-	return len(val) >= len(t) && val[:len(t)] == t
+	if len(val) >= len(t) {
+		return val[:len(t)] == t
+	}
+
+	return false
 }
 
 func setOpt(to tagOpts, opt string) (tagOpts, error) {

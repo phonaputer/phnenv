@@ -182,8 +182,8 @@ Pointers are parsed using the same rules mentioned above.
 
 ## Included Dependendies
 
-The only dependency included within `phnenv` is `github.com/stretchr/testify`, and it is only used in the unit test.
-So you can rest easy in the knowledge that this library does not bring with it potentially malicious code.
+The only dependency included within `phnenv` is `github.com/stretchr/testify`, and it is only used in the unit tests.
+So you don't need to worry about this library bringing with it potentially malicious code.
 
 ## License
 

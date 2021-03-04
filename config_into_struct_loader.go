@@ -11,8 +11,6 @@ import (
 const (
 	phnEnvStructTag = "phnenv"
 
-	listSeparator = ","
-
 	errWrapFmt   = "phnenv: %w"
 	fieldWrapFmt = `field "%s": %w`
 )
@@ -72,6 +70,7 @@ type confGetter func(string) (string, bool)
 //   rune
 //   bitsize:
 //   base:
+//   sep:
 //
 // The `rune` parsing option can be applied to fields of type int32
 // (the standard Go rune type is an alias for int32, so you can also use the type rune).
@@ -111,7 +110,22 @@ type confGetter func(string) (string, bool)
 //      Field int `phnenv:"ENV_VAR,base:2"`
 //   }{}
 //
-// Details on how parsing works for each type:
+// The `sep:` option specifies the string used to split a single environment variable into a
+// list of strings when parsing a slice type. This works the same as the sep argument to the
+// standard library strings.Split function. Please check the strings docs for more info.
+// The default separator is ",".
+// The following is an example where the environment variable will be split on "||".
+// The resulting value in s.Field will be ["abc", "123"]:
+//
+//   // In the OS: `ENV_VAR=abc||123`
+//
+//   s struct {
+//      Field []string `phnenv:"ENV_VAR,sep:||"`
+//   }{}
+//
+//   phnenv.Parse(&s)
+//
+// Brief overview of how parsing works for each type:
 //
 //   string: copied directly from the environment variable
 //   int: parsed using strconv.ParseInt
@@ -120,8 +134,8 @@ type confGetter func(string) (string, bool)
 //   complex: parsed using strconv.ParseComplex
 //   bool: if the environment variable's string equals (ignoring case) "true" then the bool
 //      will be true
-//   slices: the environment variable's string will be split using "," as the separator
-//      and the indexes will be handled individually
+//   slices: the environment variable's string will be split with strings.Split using a configurable
+//      separator. Then, each index will be parsed individually as the slice element type.
 //
 // Errors will be returned by Parse in the following cases:
 //    1. Parsing one or more field fails for any reason.
@@ -331,7 +345,7 @@ func setBasicComplex(conf string, to tagOpts, fieldVal reflect.Value) error {
 func setSlice(conf string, to tagOpts, fv reflect.Value) error {
 	var splt []string
 	if len(conf) > 0 {
-		splt = strings.Split(conf, listSeparator)
+		splt = strings.Split(conf, to.SliceSep)
 	}
 
 	res := reflect.MakeSlice(fv.Type(), len(splt), len(splt))

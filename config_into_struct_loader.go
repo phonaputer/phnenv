@@ -133,10 +133,8 @@ type confGetter func(string) (string, bool)
 //   uint: parsed using strconv.ParseUint
 //   float: parsed using strconv.ParseFloat
 //   complex: parsed using strconv.ParseComplex
-//   bool: if the environment variable's string equals (ignoring case) "true" then the bool
-//      will be true
-//   slices: the environment variable's string will be split with strings.Split using a configurable
-//      separator. Then, each index will be parsed individually as the slice element type.
+//   bool: if the environment variable's string equals (ignoring case) "true" then the bool will be true
+//   slices: the environment variable's string will be split with strings.Split using a configurable separator. Then, each index will be parsed individually as the slice element type.
 //
 // Errors will be returned by Parse in the following cases:
 //    1. Parsing one or more field fails for any reason.

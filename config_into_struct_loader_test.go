@@ -30,8 +30,17 @@ func Test_Parse_MultipleFieldsInOneStruct_MapsAllFields(t *testing.T) {
 			B *struct {
 				A string `phnenv:"KBA"`
 			}
+			C string
 		}
 	}{}
+	s.K = &struct {
+		A string `phnenv:"KA"`
+		B *struct {
+			A string `phnenv:"KBA"`
+		}
+		C string
+	}{}
+	s.K.C = "default"
 
 	g := func(s string) (string, bool) {
 		switch s {
@@ -85,6 +94,7 @@ func Test_Parse_MultipleFieldsInOneStruct_MapsAllFields(t *testing.T) {
 	assert.Equal(t, "yes", s.K.A)
 	assert.Equal(t, "KBA", s.K.B.A)
 	assert.Equal(t, "GDA", (*s.G.D).A)
+	assert.Equal(t, "default", s.K.C)
 }
 
 var test_parse_TagOpts_PositiveCases = []struct {

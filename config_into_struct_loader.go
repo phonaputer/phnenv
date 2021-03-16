@@ -187,14 +187,16 @@ func iterateStruct(c confGetter, sv reflect.Value) error {
 }
 
 func iterateStructPtr(c confGetter, fv reflect.Value) error {
-	newPtr := reflect.New(fv.Type().Elem())
-	fv.Set(newPtr)
-
-	if fv.Type().Elem().Kind() == reflect.Ptr {
-		return iterateStructPtr(c, reflect.Indirect(newPtr))
+	if fv.IsNil() {
+		newPtr := reflect.New(fv.Type().Elem())
+		fv.Set(newPtr)
 	}
 
-	err := iterateStruct(c, reflect.Indirect(newPtr))
+	if fv.Type().Elem().Kind() == reflect.Ptr {
+		return iterateStructPtr(c, reflect.Indirect(fv))
+	}
+
+	err := iterateStruct(c, reflect.Indirect(fv))
 	if err != nil {
 		return err
 	}

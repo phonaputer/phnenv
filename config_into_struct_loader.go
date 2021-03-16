@@ -186,9 +186,28 @@ func iterateStruct(c confGetter, sv reflect.Value) error {
 	return nil
 }
 
+func iterateStructPtr(c confGetter, fv reflect.Value) error {
+	newPtr := reflect.New(fv.Type().Elem())
+	fv.Set(newPtr)
+
+	if fv.Type().Elem().Kind() == reflect.Ptr {
+		return iterateStructPtr(c, reflect.Indirect(newPtr))
+	}
+
+	err := iterateStruct(c, reflect.Indirect(newPtr))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func loadConfAndSetField(c confGetter, sf reflect.StructField, fv reflect.Value) error {
-	if fv.Kind() == reflect.Struct {
+	if isStruct(fv.Type()) {
 		return iterateStruct(c, fv)
+	}
+	if isStructPtr(fv.Type()) {
+		return iterateStructPtr(c, fv)
 	}
 
 	conf, to, ok, err := parseStructTagAndLoadConf(c, sf)
@@ -205,6 +224,18 @@ func loadConfAndSetField(c confGetter, sf reflect.StructField, fv reflect.Value)
 	}
 
 	return nil
+}
+
+func isStructPtr(ft reflect.Type) bool {
+	if ft.Kind() == reflect.Ptr {
+		return isStructPtr(ft.Elem())
+	}
+
+	return isStruct(ft)
+}
+
+func isStruct(ft reflect.Type) bool {
+	return ft.Kind() == reflect.Struct
 }
 
 func parseStructTagAndLoadConf(c confGetter, sf reflect.StructField) (string, tagOpts, bool, error) {
